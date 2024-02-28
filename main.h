@@ -16,6 +16,9 @@
 # include <fcntl.h>
 # include <sys/wait.h>
 # include <sys/types.h>
+# include <stdio.h>
+# include <stdlib.h>
+
 typedef struct s_pipex
 {
 	int 	pid1;

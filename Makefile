@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -MMD -MP
+CFLAGS = -Wall -Wextra -Werror -MMD -MP -g3
 NAME = pipex
 SRC = main.c
 OBJ = $(SRC:.c=.o)
@@ -13,12 +13,12 @@ FT_PRINTF_SRC = ft_printf/ft_printf.c ft_printf/print_char.c ft_printf/print_dec
 FT_PRINTF_OBJ = $(FT_PRINTF_SRC:.c=.o)
 FT_PRINTF_DEPS = $(FT_PRINTF_OBJ:.o=.d)
 LIBFT= libft/libft.a
-LIBFT_SRC = ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c ft_isascii.c \
-      ft_isdigit.c ft_isprint.c ft_memchr.c ft_memcmp.c ft_memcpy.c ft_memmove.c \
-      ft_memset.c ft_strchr.c ft_strdup.c ft_strlcat.c ft_strlcpy.c ft_strlen.c \
-      ft_strncmp.c ft_strnstr.c ft_strrchr.c ft_tolower.c ft_toupper.c ft_split.c \
-      ft_itoa.c ft_putchar_fd.c ft_putendl_fd.c ft_putstr_fd.c ft_striteri.c ft_strjoin.c \
-      ft_strjoin.c ft_strmapi.c ft_strtrim.c ft_substr.c ft_putnbr_fd.c
+LIBFT_SRC = libft/ft_atoi.c libft/ft_bzero.c libft/ft_calloc.c libft/ft_isalnum.c libft/ft_isalpha.c libft/ft_isascii.c \
+	libft/ft_isdigit.c libft/ft_isprint.c libft/ft_memchr.c libft/ft_memcmp.c libft/ft_memcpy.c libft/ft_memmove.c \
+	libft/ft_memset.c libft/ft_strchr.c libft/ft_strdup.c libft/ft_strlcat.c libft/ft_strlcpy.c libft/ft_strlen.c \
+	libft/ft_strncmp.c libft/ft_strnstr.c libft/ft_strrchr.c libft/ft_tolower.c libft/ft_toupper.c libft/ft_split.c \
+	libft/ft_itoa.c libft/ft_putchar_fd.c libft/ft_putendl_fd.c libft/ft_putstr_fd.c libft/ft_striteri.c libft/ft_strjoin.c \
+	libft/ft_strjoin.c libft/ft_strmapi.c libft/ft_strtrim.c libft/ft_substr.c libft/ft_putnbr_fd.c
 LIBFT_OBJ = $(LIBFT_SRC:.c=.o)
 LIBFT_DEPS = $(LIBFT_OBJ:.o=.d)
 
