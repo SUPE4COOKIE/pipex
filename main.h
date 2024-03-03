@@ -21,14 +21,12 @@
 
 typedef struct s_pipex
 {
-	int 	pid1;
-	int 	pid2;
-	int 	fd[2];
+	pid_t	pid[2];
+	int 	pipe_fd[2];
+	int		files_fd[2];
 	char	**path;
 	char	*cmd[2];
 	char	**args[2];
-	char	*infile;
-	char	*outfile;
 }				t_pipex;
 
 char	*get_next_line(int fd);

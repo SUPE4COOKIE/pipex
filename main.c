@@ -69,20 +69,97 @@ void	save_args(t_pipex *pipex, char **av)
 	pipex->args[1] = ft_split(av[3], ' ');
 }
 
+int	get_cmd_path(t_pipex *pipex)
+{
+	size_t	i;
+	size_t	j;
+	char	*ex_path;
+
+	i = 0;
+	j = 0;
+	while (j < 2)
+	{
+		while (pipex->path[i])
+		{
+			ex_path = ft_strjoin(pipex->path[i], "/");
+			ex_path = ft_strjoin(ex_path, pipex->cmd[j]);
+			if (access(ex_path, F_OK) == 0 && access(ex_path, X_OK) == 0)
+			{
+				pipex->cmd[j] = ex_path;
+				break ;
+			}
+			free(ex_path);
+			i++;
+		}
+		j++;
+	}
+	if (access(pipex->cmd[0], F_OK) != 0 || access(pipex->cmd[0], X_OK) != 0)
+		exit_error(*pipex);
+	if (access(pipex->cmd[1], F_OK) != 0 || access(pipex->cmd[1], X_OK) != 0)
+		exit_error(*pipex);
+	return (1);
+}
+
+int in_cmd(t_pipex *pipex)
+{
+	dup2(pipex->files_fd[0], STDIN_FILENO);
+	dup2(pipex->pipe_fd[1], STDOUT_FILENO);
+	close(pipex->pipe_fd[1]);
+	close(pipex->files_fd[0]);
+	close(pipex->files_fd[0]);
+	execve(pipex->cmd[0], pipex->args[0], NULL);
+	exit_error(*pipex);
+	return 1;
+}
+
+int out_cmd(t_pipex *pipex)
+{
+	dup2(pipex->files_fd[1], STDOUT_FILENO);
+	dup2(pipex->pipe_fd[0], STDIN_FILENO);
+	close(pipex->pipe_fd[0]);
+	close(pipex->pipe_fd[1]);
+	close(pipex->files_fd[1]);
+	execve(pipex->cmd[1], pipex->args[1], NULL);
+	exit_error(*pipex);
+	return 1;
+}
+
+int	pipex_parent(t_pipex *pipex)
+{
+	if (pipe(pipex->pipe_fd) == -1)
+		exit_error(*pipex);
+	pipex->pid[0] = fork();
+	if (pipex->pid[0] == -1)
+		exit_error(*pipex);
+	if (pipex->pid[0] == 0)
+		in_cmd(pipex);
+	if (pipex->pid[0] > 0)
+		pipex->pid[1] = fork();
+	if (pipex->pid[1] == -1)
+		exit_error(*pipex);
+	if (pipex->pid[1] == 0 && pipex->pid[0] > 0)
+		out_cmd(pipex);
+	close(pipex->pipe_fd[0]);
+	close(pipex->pipe_fd[1]);
+	waitpid(pipex->pid[0], NULL, 0);
+	waitpid(pipex->pid[1], NULL, 0);
+	return (1);
+}
+
 int main(int ac, char **av, char **env)
 {
 	(void)ac;
-	(void)av;
 	t_pipex	pipex;
 
+	//check_args(ac, av);
+	pipex.cmd[0] = NULL;
+	pipex.cmd[1] = NULL;
 	save_path(&pipex, env);
 	save_cmds(&pipex, av);
 	save_args(&pipex, av);
-	pipex.infile = av[1];
-	pipex.outfile = av[4];
-	pipex.fd[0] = open(pipex.infile, O_RDONLY);
-	pipex.fd[1] = open(pipex.outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (pipex.fd[0] == -1 || pipex.fd[1] == -1)
-		exit_error(pipex);
+	pipex.files_fd[0] = open(av[1], O_RDONLY);
+	pipex.files_fd[1] = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	get_cmd_path(&pipex);
+	pipex_parent(&pipex);
 	return (0);
 }
