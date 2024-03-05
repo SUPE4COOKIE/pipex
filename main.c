@@ -16,7 +16,7 @@ void	exit_error(t_pipex	pipex)
 {
 	(void)pipex;
 	free_pipex(&pipex);
-	ft_printf("Error\n");
+	write(2, "Error\n", 6);
 	exit(1);
 }
 
@@ -45,6 +45,8 @@ void	save_cmds(t_pipex *pipex, char **av)
 	size_t	i;
 
 	i = 0;
+	if (!av[2] || !av[3])
+		exit_error(*pipex);
 	pipex->cmd[0] = malloc(sizeof(char) * ft_strlen(av[2]) + 1);
 	pipex->cmd[1] = malloc(sizeof(char) * ft_strlen(av[3]) + 1);
 	while (av[2][i] && av[2][i] != ' ')
@@ -74,29 +76,39 @@ int	get_cmd_path(t_pipex *pipex)
 	size_t	j;
 	char	*ex_path;
 
-	i = 0;
+
 	j = 0;
 	while (j < 2)
 	{
-		while (pipex->path[i])
+		i = 0;
+		if (pipex->cmd[j])
 		{
-			ex_path = ft_strjoin(pipex->path[i], "/");
-			ex_path = ft_strjoin(ex_path, pipex->cmd[j]);
-			if (access(ex_path, F_OK) == 0 && access(ex_path, X_OK) == 0)
+			while (pipex->path[i])
 			{
-				free(pipex->cmd[j]);
-				pipex->cmd[j] = ex_path;
-				break ;
+				ex_path = ft_strjoin(pipex->path[i], "/");
+				ex_path = ft_strjoin(ex_path, pipex->cmd[j]);
+				if (access(ex_path, F_OK) == 0 && access(ex_path, X_OK) == 0)
+				{
+					free(pipex->cmd[j]);
+					pipex->cmd[j] = ex_path;
+					break ;
+				}
+				free(ex_path);
+				i++;
 			}
-			free(ex_path);
-			i++;
 		}
 		j++;
 	}
 	if (access(pipex->cmd[0], F_OK) != 0 || access(pipex->cmd[0], X_OK) != 0)
-		exit_error(*pipex);
+	{
+		write(2, "Error1\n", 7);
+		pipex->cmd[0] = NULL;
+	}
 	if (access(pipex->cmd[1], F_OK) != 0 || access(pipex->cmd[1], X_OK) != 0)
-		exit_error(*pipex);
+	{
+		write(2, "Error2\n", 7);
+		pipex->cmd[1] = NULL;
+	}
 	return (1);
 }
 
@@ -130,16 +142,22 @@ int	pipex_parent(t_pipex *pipex)
 {
 	if (pipe(pipex->pipe_fd) == -1)
 		exit_error(*pipex);
-	pipex->pid[0] = fork();
-	if (pipex->pid[0] == -1)
-		exit_error(*pipex);
-	if (pipex->pid[0] == 0)
-		in_cmd(pipex);
-	pipex->pid[1] = fork();
-	if (pipex->pid[1] == -1)
-		exit_error(*pipex);
-	if (pipex->pid[1] == 0)
-		out_cmd(pipex);
+	if (pipex->cmd[0])
+	{
+		pipex->pid[0] = fork();
+		if (pipex->pid[0] == -1)
+			exit_error(*pipex);
+		if (pipex->pid[0] == 0)
+			in_cmd(pipex);
+	}
+	if (pipex->cmd[1])
+	{
+		pipex->pid[1] = fork();
+		if (pipex->pid[1] == -1)
+			exit_error(*pipex);
+		if (pipex->pid[1] == 0)
+			out_cmd(pipex);
+	}
 	close(pipex->pipe_fd[0]);
 	close(pipex->pipe_fd[1]);
 	waitpid(pipex->pid[0], NULL, 0);
@@ -151,7 +169,7 @@ void check_args(int ac)
 {
 	if (ac != 5)
 	{
-		ft_printf("Error\n");
+		write(2, "Error\n", 6);
 		exit(1);
 	}
 }
@@ -198,6 +216,10 @@ int main(int ac, char **av, char **env)
 	save_args(&pipex, av);
 	pipex.files_fd[0] = open(av[1], O_RDONLY);
 	pipex.files_fd[1] = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (pipex.files_fd[0] == -1)
+		pipex.cmd[0] = NULL;
+	if (pipex.files_fd[1] == -1)
+		pipex.cmd[1] = NULL;
 	get_cmd_path(&pipex);
 	pipex_parent(&pipex);
 	close(pipex.files_fd[0]);
