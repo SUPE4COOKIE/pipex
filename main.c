@@ -15,7 +15,7 @@
 void	exit_error(t_pipex	pipex)
 {
 	(void)pipex;
-	// TODO: free all the mallocs
+	free_pipex(&pipex);
 	ft_printf("Error\n");
 	exit(1);
 }
@@ -64,9 +64,8 @@ void	save_cmds(t_pipex *pipex, char **av)
 
 void	save_args(t_pipex *pipex, char **av)
 {
-	// add "" support
-	pipex->args[0] = ft_split(av[2], ' ');
-	pipex->args[1] = ft_split(av[3], ' ');
+	pipex->args[0] = ft_split_args(av[2], ' ');
+	pipex->args[1] = ft_split_args(av[3], ' ');
 }
 
 int	get_cmd_path(t_pipex *pipex)
@@ -85,6 +84,7 @@ int	get_cmd_path(t_pipex *pipex)
 			ex_path = ft_strjoin(ex_path, pipex->cmd[j]);
 			if (access(ex_path, F_OK) == 0 && access(ex_path, X_OK) == 0)
 			{
+				free(pipex->cmd[j]);
 				pipex->cmd[j] = ex_path;
 				break ;
 			}
@@ -147,7 +147,7 @@ int	pipex_parent(t_pipex *pipex)
 	return (1);
 }
 
-void check_args(ac, av)
+void check_args(int ac)
 {
 	if (ac != 5)
 	{
@@ -156,12 +156,41 @@ void check_args(ac, av)
 	}
 }
 
+void free_pipex(t_pipex *pipex)
+{
+	size_t	i;
+
+	i = 0;
+	while (pipex->path[i])
+	{
+		free(pipex->path[i]);
+		i++;
+	}
+	free(pipex->path);
+	i = 0;
+	while (pipex->args[0][i])
+	{
+		free(pipex->args[0][i]);
+		i++;
+	}
+	free(pipex->args[0]);
+	i = 0;
+	while (pipex->args[1][i])
+	{
+		free(pipex->args[1][i]);
+		i++;
+	}
+	free(pipex->args[1]);
+	free(pipex->cmd[0]);
+	free(pipex->cmd[1]);
+}
+
 int main(int ac, char **av, char **env)
 {
 	(void)ac;
 	t_pipex	pipex;
 
-	check_args(ac, av);
+	check_args(ac);
 	pipex.cmd[0] = NULL;
 	pipex.cmd[1] = NULL;
 	save_path(&pipex, env);
@@ -173,5 +202,6 @@ int main(int ac, char **av, char **env)
 	pipex_parent(&pipex);
 	close(pipex.files_fd[0]);
 	close(pipex.files_fd[1]);
+	free_pipex(&pipex);
 	return (0);
 }

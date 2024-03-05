@@ -1,32 +1,51 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_split.c                                         :+:      :+:    :+:   */
+/*   ft_split_args.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 11:57:11 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/05 06:18:44 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/05 07:17:03 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "main.h"
+
+static int is_in_quote(char c, char *in_quote)
+{
+	if (c == '\'' || c == '"')
+	{
+		if (*in_quote == 0)
+			*in_quote = c;
+		else if (*in_quote == c)
+			*in_quote = 0;
+		return (1);
+	}
+	return (0);
+}
 
 static char	*copy_str(const char *str, size_t start, size_t len)
 {
 	char	*str_copy;
 	size_t	i;
+	size_t	j;
 
 	str_copy = malloc(len + 1);
 	if (str_copy == NULL)
 		return (NULL);
 	i = 0;
+	j = 0;
 	while (i < len)
 	{
-		str_copy[i] = str[start + i];
+		if (str[start + i] != '\'' && str[start + i] != '"')
+		{
+			str_copy[j] = str[start + i];
+			j++;
+		}
 		i++;
 	}
-	str_copy[i] = '\0';
+	str_copy[j] = '\0';
 	return (str_copy);
 }
 
@@ -63,13 +82,16 @@ static char	**fill(char **split, char const *str, char sep)
 	size_t	i;
 	size_t	j;
 	size_t	start;
+	char	in_quote;
 
 	i = 0;
 	j = 0;
 	start = 0;
+	in_quote = 0;
 	while (str[i])
 	{
-		if (str[i] == (const char)sep)
+		is_in_quote(str[i], &in_quote);
+		if (str[i] == (const char)sep && !in_quote)
 		{
 			if (i > start)
 			{
@@ -86,19 +108,22 @@ static char	**fill(char **split, char const *str, char sep)
 	return (split);
 }
 
-char	**ft_split(char const *str, char sep)
+char	**ft_split_args(char const *str, char sep)
 {
 	char	**split;
 	size_t	count;
 	size_t	i;
+	char	in_quote;
 
 	count = 0;
 	i = 0;
+	in_quote = 0;
 	if (str[i] && str[i] != sep)
 		count++;
 	while (str[i])
 	{
-		if (str[i] == sep && (str[i + 1] && str[i + 1] != sep))
+		is_in_quote(str[i], &in_quote);
+		if (str[i] == sep && (str[i + 1] && str[i + 1] != sep) && !in_quote)
 			count++;
 		i++;
 	}
@@ -113,3 +138,15 @@ char	**ft_split(char const *str, char sep)
 	}
 	return (split);
 }
+//int main(void)
+//{
+//	char *str = "awk '{count++} END {print count}'";
+//	char **split = ft_split_args(str, ' ');
+//	int i = 0;
+//	while (split[i])
+//	{
+//		printf("%s\n", split[i]);
+//		i++;
+//	}
+//	return (0);
+//}
