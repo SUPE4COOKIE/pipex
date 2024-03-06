@@ -71,23 +71,31 @@ void	save_args(t_pipex *pipex, char **av)
 	pipex->args[1] = ft_split_args(av[3], ' ');
 }
 
+int	is_current_path(char *str)
+{
+	if (ft_strnstr(str, "./", ft_strlen(str)))
+		return (1);
+	return (0);
+}
+
 int	get_cmd_path(t_pipex *pipex)
 {
 	size_t	i;
 	size_t	j;
 	char	*ex_path;
-
+	char	*tmp;
 
 	j = 0;
 	while (j < 2)
 	{
 		i = 0;
-		if (pipex->cmd[j])
+		if (pipex->cmd[j] && !is_current_path(pipex->cmd[j]))
 		{
 			while (pipex->path[i])
 			{
-				ex_path = ft_strjoin(pipex->path[i], "/");
-				ex_path = ft_strjoin(ex_path, pipex->cmd[j]);
+				tmp = ft_strjoin(pipex->path[i], "/");
+				ex_path = ft_strjoin(tmp, pipex->cmd[j]);
+				free(tmp);
 				if (access(ex_path, F_OK) == 0 && access(ex_path, X_OK) == 0)
 				{
 					free(pipex->cmd[j]);
@@ -100,14 +108,16 @@ int	get_cmd_path(t_pipex *pipex)
 		}
 		j++;
 	}
-	if (access(pipex->cmd[0], F_OK) != 0 || access(pipex->cmd[0], X_OK) != 0)
+	if (!pipex->cmd[0] || access(pipex->cmd[0], F_OK) != 0 || access(pipex->cmd[0], X_OK) != 0)
 	{
 		write(2, "Error1\n", 7);
+		free(pipex->cmd[0]);
 		pipex->cmd[0] = NULL;
 	}
-	if (access(pipex->cmd[1], F_OK) != 0 || access(pipex->cmd[1], X_OK) != 0)
+	if (!pipex->cmd[1] || access(pipex->cmd[1], F_OK) != 0 || access(pipex->cmd[1], X_OK) != 0)
 	{
 		write(2, "Error2\n", 7);
+		free(pipex->cmd[1]);
 		pipex->cmd[1] = NULL;
 	}
 	return (1);
@@ -161,8 +171,10 @@ int	pipex_parent(t_pipex *pipex)
 	}
 	close(pipex->pipe_fd[0]);
 	close(pipex->pipe_fd[1]);
-	waitpid(pipex->pid[0], NULL, 0);
-	waitpid(pipex->pid[1], NULL, 0);
+	if (pipex->cmd[0])
+		waitpid(pipex->pid[0], NULL, 0);
+	if (pipex->cmd[1])
+		waitpid(pipex->pid[1], NULL, 0);
 	return (1);
 }
 
@@ -210,21 +222,27 @@ int main(int ac, char **av, char **env)
 	t_pipex	pipex;
 
 	check_args(ac);
-	pipex.cmd[0] = NULL;
-	pipex.cmd[1] = NULL;
 	save_path(&pipex, env);
 	save_cmds(&pipex, av);
 	save_args(&pipex, av);
 	pipex.files_fd[0] = open(av[1], O_RDONLY);
 	pipex.files_fd[1] = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (pipex.files_fd[0] == -1)
+	{
+		free(pipex.cmd[0]);
 		pipex.cmd[0] = NULL;
+	}
 	if (pipex.files_fd[1] == -1)
+	{
+		free(pipex.cmd[1]);
 		pipex.cmd[1] = NULL;
+	}
 	get_cmd_path(&pipex);
 	pipex_parent(&pipex);
-	close(pipex.files_fd[0]);
-	close(pipex.files_fd[1]);
+	if (pipex.files_fd[0] != -1)
+		close(pipex.files_fd[0]);
+	if (pipex.files_fd[1] != -1)
+		close(pipex.files_fd[1]);
 	free_pipex(&pipex);
 	return (0);
 }
