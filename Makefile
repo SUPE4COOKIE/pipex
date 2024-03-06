@@ -1,6 +1,6 @@
 CFLAGS = -Wall -Wextra -Werror -MMD -MP -g3
 NAME = pipex
-SRC = main.c ft_split_args.c
+SRC = src/main.c src/ft_split_args.c
 OBJ = $(SRC:.c=.o)
 OBJDEPS = $(OBJ:.o=.d)
 GNL = get_next_line/gnl.a

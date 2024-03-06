@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.h"
+#include "../includes/libft.h"
+#include "../includes/main.h"
 
 void	exit_error(t_pipex	pipex)
 {

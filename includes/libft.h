@@ -10,24 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAIN_H
-# define MAIN_H
+#ifndef LIBFT_H
+# define LIBFT_H
 # include <unistd.h>
-# include <fcntl.h>
-# include <sys/wait.h>
-# include <sys/types.h>
-# include <stdio.h>
 # include <stdlib.h>
-
-typedef struct s_pipex
-{
-	pid_t	pid[2];
-	int 	pipe_fd[2];
-	int		files_fd[2];
-	char	**path;
-	char	*cmd[2];
-	char	**args[2];
-}				t_pipex;
 
 char	*get_next_line(int fd);
 int		ft_printf(const char *s, ...);
@@ -81,6 +67,4 @@ void			ft_lstclear(t_list **lst, void (*del)(void*));
 void			ft_lstiter(t_list *lst, void (*f)(void *));
 t_list			*ft_lstmap(t_list *lst, void *(*f)(void *),
 					void (*del)(void *));
-void			free_pipex(t_pipex *pipex);
-char			**ft_split_args(char const *str, char sep);
 #endif

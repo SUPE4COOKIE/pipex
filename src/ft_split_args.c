@@ -6,11 +6,11 @@
 /*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 11:57:11 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/05 07:17:03 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/06 08:23:56 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.h"
+#include "../includes/libft.h"
 
 static int is_in_quote(char c, char *in_quote)
 {
