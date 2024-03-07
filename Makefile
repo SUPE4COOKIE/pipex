@@ -3,10 +3,6 @@ NAME = pipex
 SRC = src/main.c src/ft_split_args.c
 OBJ = $(SRC:.c=.o)
 OBJDEPS = $(OBJ:.o=.d)
-GNL = get_next_line/gnl.a
-GNL_SRC = get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
-GNL_OBJ = $(GNL_SRC:.c=.o)
-GNL_DEPS = $(GNL_OBJ:.o=.d)
 FT_PRINTF = ft_printf/libftprintf.a
 FT_PRINTF_SRC = ft_printf/ft_printf.c ft_printf/print_char.c ft_printf/print_dec.c \
 				ft_printf/print_hex.c ft_printf/print_ptr.c ft_printf/print_string.c

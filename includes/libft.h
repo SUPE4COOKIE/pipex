@@ -15,8 +15,8 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-char	*get_next_line(int fd);
-int		ft_printf(const char *s, ...);
+char			*get_next_line(int fd);
+int				ft_printf(const char *s, ...);
 int				ft_atoi(const char *nptr);
 void			ft_bzero(void *s, size_t n);
 void			*ft_calloc(size_t nmemb, size_t size);

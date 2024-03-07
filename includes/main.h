@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
+/*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 08:16:43 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/06 08:17:01 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:18:30 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,12 @@
 # include <sys/types.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <errno.h>
+
 typedef struct s_pipex
 {
 	pid_t	pid[2];
-	int 	pipe_fd[2];
+	int		pipe_fd[2];
 	int		files_fd[2];
 	char	**path;
 	char	*cmd[2];
