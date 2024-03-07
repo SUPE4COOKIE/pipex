@@ -21,24 +21,50 @@ void	exit_error(t_pipex	pipex)
 	exit(1);
 }
 
+void	set_sysbin(t_pipex *pipex)
+{
+	pipex->path = malloc(sizeof(char *) * 2);
+	if (!pipex->path)
+		exit_error(*pipex);
+	pipex->path[0] = ft_strdup("/bin");
+	if (!pipex->path[0])
+		exit_error(*pipex);
+	pipex->path[1] = NULL;
+}
+
 void	save_path(t_pipex *pipex, char **env)
 {
 	size_t	i;
 	char	*path;
 
 	i = 0;
-	while (env[i])
+	if (!env || !env[0])
+		set_sysbin(pipex);
+	else
 	{
-		if (ft_strncmp(env[i], "PATH=", 5) == 0)
+		while (env[i])
 		{
-			path = ft_strdup(env[i] + 5);
-			pipex->path = ft_split(path, ':');
-			free(path);
-			return ;
+			if (ft_strncmp(env[i], "PATH=", 5) == 0)
+			{
+				if (env[i][5] == 0)
+					set_sysbin(pipex);
+				else
+				{
+					path = ft_strdup(env[i] + 5);
+					if (!path)
+						exit_error(*pipex);
+					pipex->path = ft_split(path, ':');
+					if (!pipex->path)
+						exit_error(*pipex);
+					free(path);
+				}
+				return ;
+			}
+			i++;
 		}
-		i++;
 	}
-	exit_error(*pipex);
+	if (!pipex->path)
+		set_sysbin(pipex);
 }
 
 void	save_cmds(t_pipex *pipex, char **av)
@@ -71,10 +97,11 @@ void	save_args(t_pipex *pipex, char **av)
 	pipex->args[1] = ft_split_args(av[3], ' ');
 }
 
-int	is_current_path(char *str)
+int	is_full_path(char *str)
 {
-	if (ft_strnstr(str, "./", ft_strlen(str)))
-		return (1);
+	if (ft_strnstr(str, "/", ft_strlen(str)))
+		if (access(str, F_OK) == 0 && access(str, X_OK) == 0)
+			return (1);
 	return (0);
 }
 
@@ -86,10 +113,25 @@ int	get_cmd_path(t_pipex *pipex)
 	char	*tmp;
 
 	j = 0;
+	if (!pipex->path)
+	{
+		if (!is_full_path(pipex->cmd[0]))
+		{
+			write(2, "command not found\n", 18);
+			free(pipex->cmd[0]);
+			pipex->cmd[0] = NULL;
+		}
+		if (!is_full_path(pipex->cmd[1]))
+		{
+			write(2, "command not found\n", 18);
+			free(pipex->cmd[1]);
+			pipex->cmd[1] = NULL;
+		}
+	}
 	while (j < 2)
 	{
 		i = 0;
-		if (pipex->cmd[j] && !is_current_path(pipex->cmd[j]))
+		if (pipex->cmd[j] && !is_full_path(pipex->cmd[j]))
 		{
 			while (pipex->path[i])
 			{
@@ -216,12 +258,28 @@ void free_pipex(t_pipex *pipex)
 	free(pipex->cmd[1]);
 }
 
+void set_null_pipex(t_pipex *pipex)
+{
+	pipex->path = NULL;
+	pipex->args[0] = NULL;
+	pipex->args[1] = NULL;
+	pipex->cmd[0] = NULL;
+	pipex->cmd[1] = NULL;
+	pipex->pipe_fd[0] = 0;
+	pipex->pipe_fd[1] = 0;
+	pipex->files_fd[0] = 0;
+	pipex->files_fd[1] = 0;
+	pipex->pid[0] = -2;
+	pipex->pid[1] = -2;
+}
+
 int main(int ac, char **av, char **env)
 {
 	(void)ac;
 	t_pipex	pipex;
 
 	check_args(ac);
+	set_null_pipex(&pipex);
 	save_path(&pipex, env);
 	save_cmds(&pipex, av);
 	save_args(&pipex, av);
