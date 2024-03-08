@@ -1,6 +1,7 @@
 CFLAGS = -Wall -Wextra -Werror -MMD -MP -g3
 NAME = pipex
-SRC = src/main.c src/ft_split_args.c
+SRC = src/main.c src/ft_split_args.c src/ft_split_args_utils.c src/parsing_cmd.c src/parsing_path.c src/path_searcher.c \
+	src/pipex.c src/utils.c
 OBJ = $(SRC:.c=.o)
 OBJDEPS = $(OBJ:.o=.d)
 LIBFT= libft/libft.a

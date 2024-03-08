@@ -67,4 +67,7 @@ void			ft_lstclear(t_list **lst, void (*del)(void*));
 void			ft_lstiter(t_list *lst, void (*f)(void *));
 t_list			*ft_lstmap(t_list *lst, void *(*f)(void *),
 					void (*del)(void *));
+void			free_str(char **split);
+int				is_in_quote(char c, char *in_quote);
+char			*copy_str(const char *str, size_t start, size_t len);
 #endif
