@@ -3,11 +3,6 @@ NAME = pipex
 SRC = src/main.c src/ft_split_args.c
 OBJ = $(SRC:.c=.o)
 OBJDEPS = $(OBJ:.o=.d)
-FT_PRINTF = ft_printf/libftprintf.a
-FT_PRINTF_SRC = ft_printf/ft_printf.c ft_printf/print_char.c ft_printf/print_dec.c \
-				ft_printf/print_hex.c ft_printf/print_ptr.c ft_printf/print_string.c
-FT_PRINTF_OBJ = $(FT_PRINTF_SRC:.c=.o)
-FT_PRINTF_DEPS = $(FT_PRINTF_OBJ:.o=.d)
 LIBFT= libft/libft.a
 LIBFT_SRC = libft/ft_atoi.c libft/ft_bzero.c libft/ft_calloc.c libft/ft_isalnum.c libft/ft_isalpha.c libft/ft_isascii.c \
 	libft/ft_isdigit.c libft/ft_isprint.c libft/ft_memchr.c libft/ft_memcmp.c libft/ft_memcpy.c libft/ft_memmove.c \
@@ -20,36 +15,24 @@ LIBFT_DEPS = $(LIBFT_OBJ:.o=.d)
 
 all: $(NAME)
 
-$(NAME): $(FT_PRINTF) $(GNL) $(LIBFT) $(OBJ)
-	cc -o $(NAME) $(OBJ) $(FT_PRINTF) $(LIBFT) $(GNL)
+$(NAME): $(GNL) $(LIBFT) $(OBJ)
+	cc -o $(NAME) $(OBJ) $(LIBFT) $(GNL)
 
 %.o: %.c
 	cc $(CFLAGS) -o $@ -c $<
-
-$(FT_PRINTF): $(FT_PRINTF_SRC)
-	$(MAKE) -C ft_printf/
-
-$(GNL) : $(GNL_SRC)
-	$(MAKE) -C get_next_line/
 
 $(LIBFT) : $(LIBFT_SRC)
 	$(MAKE) -C libft/
 
 -include $(OBJDEPS)
--include $(FT_PRINTF_DEPS)
--include $(GNL_DEPS)
 -include $(LIBFT_DEPS)
 
 clean:
 	rm -f $(OBJ) $(OBJDEPS)
-	$(MAKE) -C ft_printf/ clean
-	$(MAKE) -C get_next_line/ clean
 	$(MAKE) -C libft/ clean
 
 fclean: clean
 	rm -f $(NAME)
-	$(MAKE) -C ft_printf/ fclean
-	$(MAKE) -C get_next_line/ fclean
 	$(MAKE) -C libft/ fclean
 
 re: fclean all

@@ -13,11 +13,11 @@
 #include "../includes/libft.h"
 #include "../includes/main.h"
 
-void	exit_error(t_pipex	*pipex, char *reason)
+void	exit_error(t_pipex	*pipex)
 {
 	if (pipex)
 		free_pipex(pipex);
-	ft_printf("Error: %s\n", reason);
+	perror("pipex");
 	exit(1);
 }
 
@@ -25,10 +25,10 @@ void	set_sysbin(t_pipex *pipex)
 {
 	pipex->path = malloc(sizeof(char *) * 2);
 	if (!pipex->path)
-		exit_error(pipex, "memory allocation failed");
+		exit_error(pipex);
 	pipex->path[0] = ft_strdup("/bin");
 	if (!pipex->path[0])
-		exit_error(pipex, "memory allocation failed");
+		exit_error(pipex);
 	pipex->path[1] = NULL;
 }
 
@@ -52,10 +52,10 @@ void	save_path(t_pipex *pipex, char **env)
 				{
 					path = ft_strdup(env[i] + 5);
 					if (!path)
-						exit_error(pipex, "memory allocation failed");
+						exit_error(pipex);
 					pipex->path = ft_split(path, ':');
 					if (!pipex->path)
-						exit_error(pipex, "memory allocation failed");
+						exit_error(pipex);
 					free(path);
 				}
 				return ;
@@ -73,11 +73,11 @@ void	save_cmds(t_pipex *pipex, char **av)
 
 	i = 0;
 	if (!av[2] || !av[3])
-		exit_error(pipex, "missing command");
+		exit_error(pipex);
 	pipex->cmd[0] = malloc(sizeof(char) * ft_strlen(av[2]) + 1);
 	pipex->cmd[1] = malloc(sizeof(char) * ft_strlen(av[3]) + 1);
 	if (!pipex->cmd[0] || !pipex->cmd[1])
-		exit_error(pipex, "memory allocation failed");
+		exit_error(pipex);
 	while (av[2][i] && av[2][i] != ' ')
 	{
 		pipex->cmd[0][i] = av[2][i];
@@ -98,7 +98,7 @@ void	save_args(t_pipex *pipex, char **av)
 	pipex->args[0] = ft_split_args(av[2], ' ');
 	pipex->args[1] = ft_split_args(av[3], ' ');
 	if (!pipex->args[0] || !pipex->args[1])
-		exit_error(pipex, "memory allocation failed");
+		exit_error(pipex);
 }
 
 int	is_full_path(char *str)
@@ -121,13 +121,21 @@ int	get_cmd_path(t_pipex *pipex)
 	{
 		if (!is_full_path(pipex->cmd[0]))
 		{
-			write(2, "command not found\n", 18);
+			tmp = ft_strjoin(pipex->cmd[0], ": command not found\n");
+			if (!tmp)
+				exit_error(pipex);
+			write(2, tmp, ft_strlen(tmp));
+			free(tmp);
 			free(pipex->cmd[0]);
 			pipex->cmd[0] = NULL;
 		}
 		if (!is_full_path(pipex->cmd[1]))
 		{
-			write(2, "command not found\n", 18);
+			tmp = ft_strjoin(pipex->cmd[1], ": command not found\n");
+			if (!tmp)
+				exit_error(pipex);
+			write(2, tmp, ft_strlen(tmp));
+			free(tmp);
 			free(pipex->cmd[1]);
 			pipex->cmd[1] = NULL;
 		}
@@ -141,10 +149,10 @@ int	get_cmd_path(t_pipex *pipex)
 			{
 				tmp = ft_strjoin(pipex->path[i], "/");
 				if (!tmp)
-					exit_error(pipex, "memory allocation failed");
+					exit_error(pipex);
 				ex_path = ft_strjoin(tmp, pipex->cmd[j]);
 				if (!ex_path)
-					exit_error(pipex, "memory allocation failed");
+					exit_error(pipex);
 				free(tmp);
 				if (access(ex_path, F_OK) == 0 && access(ex_path, X_OK) == 0)
 				{
@@ -158,17 +166,25 @@ int	get_cmd_path(t_pipex *pipex)
 		}
 		j++;
 	}
-	if (!pipex->cmd[0] || access(pipex->cmd[0], F_OK) != 0 \
-		|| access(pipex->cmd[0], X_OK) != 0)
+	if (pipex->cmd[0] && (access(pipex->cmd[0], F_OK) != 0 \
+		|| access(pipex->cmd[0], X_OK) != 0))
 	{
-		write(2, "Command not found\n", 18);
+		tmp = ft_strjoin(pipex->cmd[0], ": command not found\n");
+		if (!tmp)
+			exit_error(pipex);
+		write(2, tmp, ft_strlen(tmp));
+		free(tmp);
 		free(pipex->cmd[0]);
 		pipex->cmd[0] = NULL;
 	}
-	if (!pipex->cmd[1] || access(pipex->cmd[1], F_OK) != 0 \
-		|| access(pipex->cmd[1], X_OK) != 0)
+	if (pipex->cmd[1] && (access(pipex->cmd[1], F_OK) != 0 \
+		|| access(pipex->cmd[1], X_OK) != 0))
 	{
-		write(2, "Command not found\n", 18); //use printf and show the command
+		tmp = ft_strjoin(pipex->cmd[1], ": command not found\n");
+		if (!tmp)
+			exit_error(pipex);
+		write(2, tmp, ft_strlen(tmp));
+		free(tmp);
 		free(pipex->cmd[1]);
 		pipex->cmd[1] = NULL;
 	}
@@ -184,7 +200,7 @@ int	in_cmd(t_pipex *pipex)
 	close(pipex->files_fd[0]);
 	close(pipex->files_fd[1]);
 	execve(pipex->cmd[0], pipex->args[0], NULL);
-	perror("Execve failed");
+	perror("pipex: ");
 	return (1);
 }
 
@@ -197,19 +213,19 @@ int	out_cmd(t_pipex *pipex)
 	close(pipex->files_fd[0]);
 	close(pipex->files_fd[1]);
 	execve(pipex->cmd[1], pipex->args[1], NULL);
-	perror("Execve failed");
+	perror("pipex");
 	return (1);
 }
 
 int	pipex_parent(t_pipex *pipex)
 {
 	if (pipe(pipex->pipe_fd) == -1)
-		exit_error(pipex, "failed to create a pipe");
+		exit_error(pipex);
 	if (pipex->cmd[0])
 	{
 		pipex->pid[0] = fork();
 		if (pipex->pid[0] == -1)
-			exit_error(pipex, "failed to fork");
+			exit_error(pipex);
 		if (pipex->pid[0] == 0)
 			in_cmd(pipex);
 	}
@@ -217,7 +233,7 @@ int	pipex_parent(t_pipex *pipex)
 	{
 		pipex->pid[1] = fork();
 		if (pipex->pid[1] == -1)
-			exit_error(pipex, "failed to fork");
+			exit_error(pipex);
 		if (pipex->pid[1] == 0)
 			out_cmd(pipex);
 	}
@@ -233,7 +249,10 @@ int	pipex_parent(t_pipex *pipex)
 void	check_args(int ac)
 {
 	if (ac != 5)
-		exit_error(NULL , "wrong number of arguments");
+	{
+		write(2, "Usage: ./pipex file1 cmd1 cmd2 file2\n", 36);
+		exit(1);
+	}
 }
 
 void	free_pipex(t_pipex *pipex)
@@ -246,26 +265,31 @@ void	free_pipex(t_pipex *pipex)
 		free(pipex->path[i]);
 		i++;
 	}
-	free(pipex->path);
+	if (pipex->path)
+		free(pipex->path);
 	i = 0;
 	while (pipex->args[0] && pipex->args[0][i])
 	{
 		free(pipex->args[0][i]);
 		i++;
 	}
-	free(pipex->args[0]);
+	if (pipex->args[0])
+		free(pipex->args[0]);
 	i = 0;
 	while (pipex->args[1] && pipex->args[1][i])
 	{
 		free(pipex->args[1][i]);
 		i++;
 	}
-	free(pipex->args[1]);
-	free(pipex->cmd[0]);
-	free(pipex->cmd[1]);
+	if (pipex->args[1])
+		free(pipex->args[1]);
+	if (pipex->cmd[0])
+		free(pipex->cmd[0]);
+	if (pipex->cmd[1])
+		free(pipex->cmd[1]);
 }
 
-void	set_null_pipex(t_pipex *pipex)
+void	init_null_pipex(t_pipex *pipex)
 {
 	pipex->path = NULL;
 	pipex->args[0] = NULL;
@@ -285,7 +309,7 @@ int	main(int ac, char **av, char **env)
 	t_pipex	pipex;
 
 	check_args(ac);
-	set_null_pipex(&pipex);
+	init_null_pipex(&pipex);
 	save_path(&pipex, env);
 	save_cmds(&pipex, av);
 	save_args(&pipex, av);
@@ -294,11 +318,13 @@ int	main(int ac, char **av, char **env)
 	if (pipex.files_fd[0] == -1)
 	{
 		free(pipex.cmd[0]);
+		perror("pipex");
 		pipex.cmd[0] = NULL;
 	}
 	if (pipex.files_fd[1] == -1)
 	{
 		free(pipex.cmd[1]);
+		perror("pipex");
 		pipex.cmd[1] = NULL;
 	}
 	get_cmd_path(&pipex);
