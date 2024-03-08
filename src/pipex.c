@@ -6,7 +6,7 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:37:43 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 18:05:21 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/08 21:22:33 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	in_cmd(t_pipex *pipex)
 	close(pipex->files_fd[0]);
 	close(pipex->files_fd[1]);
 	execve(pipex->cmd[0], pipex->args[0], NULL);
-	perror("pipex: ");
+	perror("pipex");
 	return (1);
 }
 

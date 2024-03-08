@@ -21,6 +21,24 @@ void	exit_error(t_pipex	*pipex)
 	exit(1);
 }
 
+void	open_files(t_pipex *pipex, char **av)
+{
+	pipex->files_fd[0] = open(av[1], O_RDONLY);
+	pipex->files_fd[1] = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (pipex->files_fd[0] == -1)
+	{
+		free(pipex->cmd[0]);
+		perror("pipex");
+		exit_error(pipex);
+	}
+	if (pipex->files_fd[1] == -1)
+	{
+		free(pipex->cmd[1]);
+		perror("pipex");
+		exit_error(pipex);
+	}
+}
+
 int	main(int ac, char **av, char **env)
 {
 	t_pipex	pipex;
@@ -30,20 +48,7 @@ int	main(int ac, char **av, char **env)
 	save_path(&pipex, env);
 	save_cmds(&pipex, av);
 	save_args(&pipex, av);
-	pipex.files_fd[0] = open(av[1], O_RDONLY);
-	pipex.files_fd[1] = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (pipex.files_fd[0] == -1)
-	{
-		free(pipex.cmd[0]);
-		perror("pipex");
-		pipex.cmd[0] = NULL;
-	}
-	if (pipex.files_fd[1] == -1)
-	{
-		free(pipex.cmd[1]);
-		perror("pipex");
-		pipex.cmd[1] = NULL;
-	}
+	open_files(&pipex, av);
 	get_cmd_path(&pipex);
 	pipex_parent(&pipex);
 	if (pipex.files_fd[0] != -1)

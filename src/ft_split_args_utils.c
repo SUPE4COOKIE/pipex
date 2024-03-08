@@ -6,17 +6,31 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:50:34 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 17:56:49 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/08 22:34:20 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
+#include "../includes/main.h"
+
+char	**init_split(size_t count)
+{
+	char	**split;
+
+	split = malloc(sizeof(char *) * (count + 1));
+	if (split == NULL)
+		return (NULL);
+	split[count] = NULL;
+	return (split);
+}
 
 void	free_str(char **split)
 {
 	size_t	i;
 
 	i = 0;
+	if (!split)
+		return ;
 	while (split[i])
 	{
 		free(split[i]);
@@ -25,7 +39,7 @@ void	free_str(char **split)
 	free(split);
 }
 
-int is_in_quote(char c, char *in_quote)
+int	is_in_quote(char c, char *in_quote)
 {
 	if (c == '\'' || c == '"')
 	{

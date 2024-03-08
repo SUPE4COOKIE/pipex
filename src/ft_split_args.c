@@ -6,7 +6,7 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 11:57:11 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 17:58:28 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/08 22:33:34 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,33 +27,35 @@ static int	fill_remain(size_t i, size_t start, char **s, const char *str)
 	return (0);
 }
 
+void	fill_node(size_t index[2], size_t *start, char **split, char const *str)
+{
+	if (index[0] > *start)
+	{
+		split[index[1]] = copy_str(str, *start, index[0] - *start);
+		if (!split[index[1]++])
+			return ;
+	}
+	*start = index[0] + 1;
+}
+
 static char	**fill(char **split, char const *str, char sep)
 {
-	size_t	i;
-	size_t	j;
+	size_t	index[2];
 	size_t	start;
 	char	in_quote;
 
-	i = 0;
-	j = 0;
+	index[0] = 0;
+	index[1] = 0;
 	start = 0;
 	in_quote = 0;
-	while (str[i])
+	while (str[index[0]])
 	{
-		is_in_quote(str[i], &in_quote);
-		if (str[i] == (const char)sep && !in_quote)
-		{
-			if (i > start)
-			{
-				split[j] = copy_str(str, start, i - start);
-				if (!split[j++])
-					return (NULL);
-			}
-			start = i + 1;
-		}
-		i++;
+		is_in_quote(str[index[0]], &in_quote);
+		if (str[index[0]] == (const char)sep && !in_quote)
+			fill_node(index, &start, split, str);
+		index[0]++;
 	}
-	if (fill_remain(i, start, &split[j], (char *)str) == -1)
+	if (fill_remain(index[0], start, &split[index[1]], (char *)str) == -1)
 		return (NULL);
 	return (split);
 }
@@ -77,15 +79,11 @@ char	**ft_split_args(char const *str, char sep)
 			count++;
 		i++;
 	}
-	split = malloc(sizeof(char *) * (count + 1));
-	if (split == NULL)
-		return (NULL);
-	split[count] = NULL;
-	if (!fill(split, str, sep))
+	split = init_split(count);
+	if (!split || !fill(split, str, sep))
 	{
 		free_str(split);
 		return (NULL);
 	}
 	return (split);
 }
-

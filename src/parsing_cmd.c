@@ -6,7 +6,7 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:34:36 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 18:01:04 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/08 20:43:13 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,9 @@ void	save_cmds(t_pipex *pipex, char **av)
 void	save_args(t_pipex *pipex, char **av)
 {
 	pipex->args[0] = ft_split_args(av[2], ' ');
+	if (!pipex->args[0])
+		exit_error(pipex);
 	pipex->args[1] = ft_split_args(av[3], ' ');
-	if (!pipex->args[0] || !pipex->args[1])
+	if (!pipex->args[1])
 		exit_error(pipex);
 }

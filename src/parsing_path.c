@@ -6,17 +6,29 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:36:30 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 18:10:46 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/08 22:33:49 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
 #include "../includes/main.h"
 
+static void	parse_path(t_pipex *pipex, char *env)
+{
+	char	*path;
+
+	path = ft_strdup(env + 5);
+	if (!path)
+		exit_error(pipex);
+	pipex->path = ft_split(path, ':');
+	if (!pipex->path)
+		exit_error(pipex);
+	free(path);
+}
+
 void	save_path(t_pipex *pipex, char **env)
 {
 	size_t	i;
-	char	*path;
 
 	i = 0;
 	if (!env || !env[0])
@@ -30,15 +42,7 @@ void	save_path(t_pipex *pipex, char **env)
 				if (env[i][5] == 0)
 					set_sysbin(pipex);
 				else
-				{
-					path = ft_strdup(env[i] + 5);
-					if (!path)
-						exit_error(pipex);
-					pipex->path = ft_split(path, ':');
-					if (!pipex->path)
-						exit_error(pipex);
-					free(path);
-				}
+					parse_path(pipex, env[i]);
 				return ;
 			}
 			i++;

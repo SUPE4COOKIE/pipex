@@ -6,7 +6,7 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:44:29 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 17:46:22 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/08 20:39:44 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	init_null_pipex(t_pipex *pipex)
 	pipex->pid[1] = -2;
 }
 
-void	free_pipex(t_pipex *pipex)
+static	void	free_pipex_elem(t_pipex *pipex)
 {
 	size_t	i;
 
@@ -54,6 +54,11 @@ void	free_pipex(t_pipex *pipex)
 		free(pipex->args[1][i]);
 		i++;
 	}
+}
+
+void	free_pipex(t_pipex *pipex)
+{
+	free_pipex_elem(pipex);
 	if (pipex->args[1])
 		free(pipex->args[1]);
 	if (pipex->cmd[0])
@@ -61,6 +66,7 @@ void	free_pipex(t_pipex *pipex)
 	if (pipex->cmd[1])
 		free(pipex->cmd[1]);
 }
+
 void	set_sysbin(t_pipex *pipex)
 {
 	pipex->path = malloc(sizeof(char *) * 2);

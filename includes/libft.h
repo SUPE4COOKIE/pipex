@@ -70,4 +70,5 @@ t_list			*ft_lstmap(t_list *lst, void *(*f)(void *),
 void			free_str(char **split);
 int				is_in_quote(char c, char *in_quote);
 char			*copy_str(const char *str, size_t start, size_t len);
+char			**init_split(size_t count);
 #endif
