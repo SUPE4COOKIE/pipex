@@ -6,7 +6,7 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:37:43 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 21:22:33 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/11 21:26:51 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,10 @@ int	in_cmd(t_pipex *pipex)
 	dup2(pipex->pipe_fd[1], STDOUT_FILENO);
 	close(pipex->pipe_fd[0]);
 	close(pipex->pipe_fd[1]);
-	close(pipex->files_fd[0]);
-	close(pipex->files_fd[1]);
+	if (pipex->files_fd[0] != -1)
+		close(pipex->files_fd[0]);
+	if (pipex->files_fd[1] != -1)
+		close(pipex->files_fd[1]);
 	execve(pipex->cmd[0], pipex->args[0], NULL);
 	perror("pipex");
 	return (1);
@@ -32,8 +34,10 @@ int	out_cmd(t_pipex *pipex)
 	dup2(pipex->pipe_fd[0], STDIN_FILENO);
 	close(pipex->pipe_fd[0]);
 	close(pipex->pipe_fd[1]);
-	close(pipex->files_fd[0]);
-	close(pipex->files_fd[1]);
+	if (pipex->files_fd[0] != -1)
+		close(pipex->files_fd[0]);
+	if (pipex->files_fd[1] != -1)
+		close(pipex->files_fd[1]);
 	execve(pipex->cmd[1], pipex->args[1], NULL);
 	perror("pipex");
 	return (1);

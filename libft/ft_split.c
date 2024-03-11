@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
+/*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 11:57:11 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/05 06:18:44 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/11 19:21:11 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../includes/libft.h"
 
-static char	*copy_str(const char *str, size_t start, size_t len)
+static char	*ccopy_str(const char *str, size_t start, size_t len)
 {
 	char	*str_copy;
 	size_t	i;
@@ -30,7 +30,7 @@ static char	*copy_str(const char *str, size_t start, size_t len)
 	return (str_copy);
 }
 
-static void	free_str(char **split)
+static void	free_sstr(char **split)
 {
 	size_t	i;
 
@@ -43,14 +43,14 @@ static void	free_str(char **split)
 	free(split);
 }
 
-static int	fill_remain(size_t i, size_t start, char **s, const char *str)
+static int	fill_rremain(size_t i, size_t start, char **s, const char *str)
 {
 	size_t	j;
 
 	j = 0;
 	if (i > start)
 	{
-		s[j] = copy_str(str, start, i - start);
+		s[j] = ccopy_str(str, start, i - start);
 		if (!s[j])
 			return (-1);
 		j++;
@@ -58,7 +58,7 @@ static int	fill_remain(size_t i, size_t start, char **s, const char *str)
 	return (0);
 }
 
-static char	**fill(char **split, char const *str, char sep)
+static char	**ffill(char **split, char const *str, char sep)
 {
 	size_t	i;
 	size_t	j;
@@ -73,7 +73,7 @@ static char	**fill(char **split, char const *str, char sep)
 		{
 			if (i > start)
 			{
-				split[j] = copy_str(str, start, i - start);
+				split[j] = ccopy_str(str, start, i - start);
 				if (!split[j++])
 					return (NULL);
 			}
@@ -81,7 +81,7 @@ static char	**fill(char **split, char const *str, char sep)
 		}
 		i++;
 	}
-	if (fill_remain(i, start, &split[j], (char *)str) == -1)
+	if (fill_rremain(i, start, &split[j], (char *)str) == -1)
 		return (NULL);
 	return (split);
 }
@@ -106,9 +106,9 @@ char	**ft_split(char const *str, char sep)
 	if (split == NULL)
 		return (NULL);
 	split[count] = NULL;
-	if (!fill(split, str, sep))
+	if (!ffill(split, str, sep))
 	{
-		free_str(split);
+		free_sstr(split);
 		return (NULL);
 	}
 	return (split);

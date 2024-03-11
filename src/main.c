@@ -28,13 +28,13 @@ void	open_files(t_pipex *pipex, char **av)
 	if (pipex->files_fd[0] == -1)
 	{
 		free(pipex->cmd[0]);
-		perror("pipex");
+		perror(av[1]);
 		pipex->cmd[0] = NULL;
 	}
 	if (pipex->files_fd[1] == -1)
 	{
 		free(pipex->cmd[1]);
-		perror("pipex");
+		perror(av[4]);
 		pipex->cmd[1] = NULL;
 	}
 }
