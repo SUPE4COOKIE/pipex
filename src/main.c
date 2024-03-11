@@ -29,13 +29,13 @@ void	open_files(t_pipex *pipex, char **av)
 	{
 		free(pipex->cmd[0]);
 		perror("pipex");
-		exit_error(pipex);
+		pipex->cmd[0] = NULL;
 	}
 	if (pipex->files_fd[1] == -1)
 	{
 		free(pipex->cmd[1]);
 		perror("pipex");
-		exit_error(pipex);
+		pipex->cmd[1] = NULL;
 	}
 }
 
