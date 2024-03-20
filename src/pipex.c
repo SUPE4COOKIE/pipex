@@ -6,7 +6,7 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:37:43 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/11 21:26:51 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/20 18:03:20 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 
 int	in_cmd(t_pipex *pipex)
 {
-	dup2(pipex->files_fd[0], STDIN_FILENO);
-	dup2(pipex->pipe_fd[1], STDOUT_FILENO);
+	if (!dup2(pipex->files_fd[0], STDIN_FILENO))
+		exit_error(pipex);
+	if (!dup2(pipex->pipe_fd[1], STDOUT_FILENO))
+		exit_error(pipex);
 	close(pipex->pipe_fd[0]);
 	close(pipex->pipe_fd[1]);
 	if (pipex->files_fd[0] != -1)
@@ -30,8 +32,10 @@ int	in_cmd(t_pipex *pipex)
 
 int	out_cmd(t_pipex *pipex)
 {
-	dup2(pipex->files_fd[1], STDOUT_FILENO);
-	dup2(pipex->pipe_fd[0], STDIN_FILENO);
+	if (!dup2(pipex->files_fd[1], STDOUT_FILENO))
+		exit_error(pipex);
+	if (!dup2(pipex->pipe_fd[0], STDIN_FILENO))
+		exit_error(pipex);
 	close(pipex->pipe_fd[0]);
 	close(pipex->pipe_fd[1]);
 	if (pipex->files_fd[0] != -1)
