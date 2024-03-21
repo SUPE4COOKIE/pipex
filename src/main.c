@@ -47,6 +47,7 @@ int	main(int ac, char **av, char **env)
 	init_null_pipex(&pipex);
 	save_path(&pipex, env);
 	save_cmds(&pipex, av);
+	cmd_nullcheck(&pipex, av);
 	save_args(&pipex, av);
 	open_files(&pipex, av);
 	get_cmd_path(&pipex);

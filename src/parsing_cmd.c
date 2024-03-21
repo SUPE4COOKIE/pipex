@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_cmd.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:34:36 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/08 20:43:13 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/21 21:30:35 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,28 @@ void	check_args(int ac)
 {
 	if (ac != 5)
 	{
-		write(2, "Usage: ./pipex file1 cmd1 cmd2 file2\n", 36);
+		write(2, "Usage: ./pipex file1 cmd1 cmd2 file2\n", 37);
 		exit(1);
+	}
+}
+
+void	cmd_nullcheck(t_pipex *pipex, char **av)
+{
+	if (!pipex->cmd[0][0])
+	{
+		free(pipex->cmd[0]);
+		pipex->cmd[0] = NULL;
+		write(2, "pipex: ", 7);
+		write(2, av[2], ft_strlen(av[2]));
+		write(2, " command not found\n", 19);
+	}
+	if (!pipex->cmd[1][0])
+	{
+		free(pipex->cmd[1]);
+		pipex->cmd[1] = NULL;
+		write(2, "pipex: ", 7);
+		write(2, av[3], ft_strlen(av[3]));
+		write(2, " command not found\n", 19);
 	}
 }
 

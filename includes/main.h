@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 08:16:43 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/11 21:26:57 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/21 21:30:58 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,5 @@ void	save_path(t_pipex *pipex, char **env);
 int		get_cmd_path(t_pipex *pipex);
 void	init_null_pipex(t_pipex *pipex);
 void	set_sysbin(t_pipex *pipex);
+void	cmd_nullcheck(t_pipex *pipex, char **av);
 #endif

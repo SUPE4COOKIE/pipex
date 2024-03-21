@@ -6,25 +6,32 @@
 /*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:37:43 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/21 17:43:51 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/21 21:17:16 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
 #include "../includes/main.h"
 
-int	in_cmd(t_pipex *pipex)
+static void	close_fds(t_pipex *pipex)
 {
-	if (dup2(pipex->files_fd[0], STDIN_FILENO) == -1)
-		exit_error(pipex);
-	if (dup2(pipex->pipe_fd[1], STDOUT_FILENO) == -1)
-		exit_error(pipex);
-	close(pipex->pipe_fd[0]);
-	close(pipex->pipe_fd[1]);
 	if (pipex->files_fd[0] != -1)
 		close(pipex->files_fd[0]);
 	if (pipex->files_fd[1] != -1)
 		close(pipex->files_fd[1]);
+	close(pipex->pipe_fd[0]);
+	close(pipex->pipe_fd[1]);
+}
+
+int	in_cmd(t_pipex *pipex)
+{
+	if (dup2(pipex->files_fd[0], STDIN_FILENO) == -1
+		|| dup2(pipex->pipe_fd[1], STDOUT_FILENO) == -1)
+	{
+		close_fds(pipex);
+		exit_error(pipex);
+	}
+	close_fds(pipex);
 	execve(pipex->cmd[0], pipex->args[0], NULL);
 	perror("pipex");
 	return (1);
@@ -32,16 +39,13 @@ int	in_cmd(t_pipex *pipex)
 
 int	out_cmd(t_pipex *pipex)
 {
-	if (dup2(pipex->files_fd[1], STDOUT_FILENO) == -1)
+	if (dup2(pipex->files_fd[1], STDOUT_FILENO) == -1
+		|| dup2(pipex->pipe_fd[0], STDIN_FILENO) == -1)
+	{
+		close_fds(pipex);
 		exit_error(pipex);
-	if (dup2(pipex->pipe_fd[0], STDIN_FILENO) == -1)
-		exit_error(pipex);
-	close(pipex->pipe_fd[0]);
-	close(pipex->pipe_fd[1]);
-	if (pipex->files_fd[0] != -1)
-		close(pipex->files_fd[0]);
-	if (pipex->files_fd[1] != -1)
-		close(pipex->files_fd[1]);
+	}
+	close_fds(pipex);
 	execve(pipex->cmd[1], pipex->args[1], NULL);
 	perror("pipex");
 	return (1);
