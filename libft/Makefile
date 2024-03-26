@@ -16,15 +16,15 @@ BONUSOBJDEPS = $(BONUSOBJ:.o=.d)
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
+$(NAME): $(OBJ) Makefile
 	ar -crs $(NAME) $(OBJ)
 
 -include $(BONUSOBJDEPS) $(OBJDEPS)
 
-bonus: $(BONUSOBJ) $(NAME)
+bonus: $(BONUSOBJ) $(NAME) Makefile
 	ar -crs $(NAME) $(BONUSOBJ)
 
-%.o: %.c
+%.o: %.c Makefile
 	cc $(CFLAGS) -o $@ -c $<
 
 clean:

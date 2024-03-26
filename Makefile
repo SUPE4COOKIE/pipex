@@ -22,7 +22,7 @@ $(NAME): $(GNL) $(LIBFT) $(OBJ) Makefile
 %.o: %.c Makefile
 	cc $(CFLAGS) -o $@ -c $<
 
-$(LIBFT) : $(LIBFT_SRC)
+$(LIBFT) : $(LIBFT_SRC) libft/Makefile
 	$(MAKE) -C libft/
 
 -include $(OBJDEPS)
