@@ -17,6 +17,10 @@ void	exit_error(t_pipex	*pipex)
 {
 	if (pipex)
 		free_pipex(pipex);
+	if (pipex->files_fd[0])
+		close(pipex->files_fd[0]);
+	if (pipex->files_fd[1])
+		close(pipex->files_fd[1]);
 	perror("pipex");
 	exit(1);
 }

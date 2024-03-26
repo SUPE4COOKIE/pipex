@@ -16,10 +16,10 @@ LIBFT_DEPS = $(LIBFT_OBJ:.o=.d)
 
 all: $(NAME)
 
-$(NAME): $(GNL) $(LIBFT) $(OBJ)
+$(NAME): $(GNL) $(LIBFT) $(OBJ) Makefile
 	cc -o $(NAME) $(OBJ) $(LIBFT) $(GNL)
 
-%.o: %.c
+%.o: %.c Makefile
 	cc $(CFLAGS) -o $@ -c $<
 
 $(LIBFT) : $(LIBFT_SRC)

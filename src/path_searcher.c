@@ -6,7 +6,7 @@
 /*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:40:42 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/11 21:22:41 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/26 19:54:45 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,10 @@ static	int	cmd_for_path(t_pipex *pipex, char *path, size_t j)
 		exit_error(pipex);
 	ex_path = ft_strjoin(tmp, pipex->cmd[j]);
 	if (!ex_path)
+	{
+		free(tmp);
 		exit_error(pipex);
+	}
 	free(tmp);
 	if (access(ex_path, F_OK) == 0 && access(ex_path, X_OK) == 0)
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwojtasi <mwojtasi@student.42lyon.fr >     +#+  +:+       +#+        */
+/*   By: mwojtasi <mwojtasi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 17:37:43 by mwojtasi          #+#    #+#             */
-/*   Updated: 2024/03/21 21:17:16 by mwojtasi         ###   ########.fr       */
+/*   Updated: 2024/03/26 19:52:25 by mwojtasi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,13 @@ static void	close_fds(t_pipex *pipex)
 		close(pipex->files_fd[1]);
 	close(pipex->pipe_fd[0]);
 	close(pipex->pipe_fd[1]);
+}
+
+static	void	pipe_exit(t_pipex *pipex)
+{
+	close(pipex->pipe_fd[0]);
+	close(pipex->pipe_fd[1]);
+	exit_error(pipex);
 }
 
 int	in_cmd(t_pipex *pipex)
@@ -59,7 +66,7 @@ int	pipex_parent(t_pipex *pipex)
 	{
 		pipex->pid[0] = fork();
 		if (pipex->pid[0] == -1)
-			exit_error(pipex);
+			pipe_exit(pipex);
 		if (pipex->pid[0] == 0)
 			in_cmd(pipex);
 	}
@@ -67,7 +74,7 @@ int	pipex_parent(t_pipex *pipex)
 	{
 		pipex->pid[1] = fork();
 		if (pipex->pid[1] == -1)
-			exit_error(pipex);
+			pipe_exit(pipex);
 		if (pipex->pid[1] == 0)
 			out_cmd(pipex);
 	}
